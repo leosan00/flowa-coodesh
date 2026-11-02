@@ -10,7 +10,6 @@ namespace OrderAccumulator.Api.Controllers;
 [Route("exposure")]
 public class ExposureController : ControllerBase
 {
-    /// <summary>Exposição financeira atual de cada ativo (0 para os que ainda não receberam ordens).</summary>
     [HttpGet]
     [ProducesResponseType<IEnumerable<ExposureResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetExposures(

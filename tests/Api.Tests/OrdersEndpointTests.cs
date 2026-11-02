@@ -9,10 +9,6 @@ using OrderAccumulator.Domain.Enums;
 
 namespace OrderAccumulator.Api.Tests;
 
-/// <summary>
-/// Testa o contrato HTTP (status, JSON e validação da requisição) com os repositórios simulados.
-/// A regra do limite está nos testes de Domain e Application; o banco, fora deste projeto.
-/// </summary>
 public sealed class OrdersEndpointTests : IClassFixture<ApiFactory>, IAsyncLifetime, IDisposable
 {
     private readonly ApiFactory _factory;

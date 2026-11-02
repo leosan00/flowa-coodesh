@@ -16,7 +16,6 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 
-    // Exemplo válido pré-preenchido no Swagger UI, para testar sem editar o corpo.
     options.AddSchemaTransformer((schema, context, _) =>
     {
         if (context.JsonTypeInfo.Type == typeof(OrderRequest))

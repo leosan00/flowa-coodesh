@@ -102,7 +102,6 @@ public sealed class OrderHistoryConsumer(
         }
         catch (OperationCanceledException)
         {
-            // desligando
         }
     }
 }

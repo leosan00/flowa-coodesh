@@ -8,7 +8,6 @@ namespace OrderAccumulator.Application.UseCases.GetExposures;
 public sealed class GetExposuresUseCase(IExposureReadModel readModel)
     : IUseCase<GetExposuresRequestModel, IReadOnlyList<ExposureView>>
 {
-    /// <summary>Devolve todos os ativos, com 0 para os que ainda não receberam ordens.</summary>
     public async Task<IReadOnlyList<ExposureView>> ExecuteAsync(GetExposuresRequestModel input, CancellationToken cancellationToken = default)
     {
         var known = (await readModel.GetExposuresAsync(cancellationToken)).ToDictionary(e => e.Symbol, e => e.Value);

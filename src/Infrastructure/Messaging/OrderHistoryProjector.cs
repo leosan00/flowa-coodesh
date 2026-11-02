@@ -4,11 +4,8 @@ using OrderAccumulator.Infrastructure.Persistence.Entities;
 
 namespace OrderAccumulator.Infrastructure.Messaging;
 
-/// <summary>Transforma o evento publicado no Kafka numa linha do histórico de ordens.</summary>
 public sealed class OrderHistoryProjector(IOrderHistoryStore store)
 {
-    /// <returns><c>true</c> se gravou; <c>false</c> se o evento já estava no histórico.</returns>
-    /// <exception cref="InvalidEventException">A mensagem não é um evento de ordem válido.</exception>
     public async Task<bool> ProjectAsync(string json, CancellationToken cancellationToken = default)
     {
         var payload = Parse(json);
@@ -50,7 +47,6 @@ public sealed class OrderHistoryProjector(IOrderHistoryStore store)
         }
     }
 
-    // Comparação pelo nome exato: Enum.TryParse aceitaria também números e variações de caixa.
     private static T ParseEnum<T>(string? value, string field) where T : struct, Enum =>
         Enum.GetNames<T>().Contains(value)
             ? Enum.Parse<T>(value!)

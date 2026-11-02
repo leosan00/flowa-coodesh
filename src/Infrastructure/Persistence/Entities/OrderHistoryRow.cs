@@ -2,10 +2,6 @@ using OrderAccumulator.Domain.Enums;
 
 namespace OrderAccumulator.Infrastructure.Persistence.Entities;
 
-/// <summary>
-/// Uma ordem processada (aceita ou rejeitada), montada a partir do evento publicado no Kafka.
-/// A chave é o <c>EventId</c>: uma entrega repetida do mesmo evento não gera uma segunda linha.
-/// </summary>
 public sealed class OrderHistoryRow
 {
     public Guid EventId { get; set; }

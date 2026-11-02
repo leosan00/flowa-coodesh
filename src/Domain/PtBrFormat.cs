@@ -2,7 +2,6 @@ using System.Globalization;
 
 namespace OrderAccumulator.Domain;
 
-/// <summary>Formatação pt-BR sem depender de ICU/cultura instalada (containers costumam rodar em modo invariante).</summary>
 internal static class PtBrFormat
 {
     private static readonly NumberFormatInfo Info = new()

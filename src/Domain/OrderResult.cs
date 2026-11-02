@@ -2,10 +2,6 @@ using OrderAccumulator.Domain.Events;
 
 namespace OrderAccumulator.Domain;
 
-/// <summary>
-/// Resultado de aplicar uma ordem a um <see cref="AssetExposure"/>.
-/// <see cref="Exposure"/> é a exposição depois da ordem quando aceita e a exposição atual (inalterada) quando rejeitada.
-/// </summary>
 public abstract record OrderResult(Order Order, decimal Exposure)
 {
     public bool IsAccepted => this is Accepted;
