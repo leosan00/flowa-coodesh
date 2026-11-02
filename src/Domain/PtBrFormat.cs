@@ -1,0 +1,16 @@
+using System.Globalization;
+
+namespace OrderAccumulator.Domain;
+
+internal static class PtBrFormat
+{
+    private static readonly NumberFormatInfo Info = new()
+    {
+        NumberDecimalSeparator = ",",
+        NumberGroupSeparator = "."
+    };
+
+    public static string Number(decimal value, string format) => value.ToString(format, Info);
+
+    public static string Money(decimal value) => $"R$ {Number(value, "N2")}";
+}
