@@ -38,7 +38,7 @@ services:
         echo "Banco OrderAccumulator pronto."
     restart: "no"
 
-  # Broker Kafka de um nó só (KRaft, sem ZooKeeper). O tópico "orders" é criado no primeiro envio, com 3 partições.
+  # Broker Kafka de um nó só (KRaft, sem ZooKeeper). O tópico "orders" (3 partições) é criado pelo kafka-init.
   # Dois listeners: EXTERNAL (localhost:9092) para a API rodando no host e INTERNAL (kafka:29092) para outros contêineres.
   kafka:
     image: apache/kafka:3.9.0
@@ -69,6 +69,16 @@ services:
       retries: 10
       start_period: 20s
 
+  kafka-init:
+    image: apache/kafka:3.9.0
+    container_name: order-kafka-init
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/opt/kafka/bin/kafka-topics.sh"]
+    command: ["--bootstrap-server", "kafka:29092", "--create", "--if-not-exists", "--topic", "orders", "--partitions", "3", "--replication-factor", "1"]
+    restart: "no"
+
   # Interface web para ver tópicos, mensagens e consumer groups do Kafka: http://localhost:8081
   kafbat:
     image: ghcr.io/kafbat/kafka-ui:v1.5.0
@@ -82,6 +92,33 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       DYNAMIC_CONFIG_ENABLED: "false"
+
+  # API (http://localhost:5080/swagger). Para rodá-la fora do Docker (dotnet run), pare este serviço: ambos usam a porta 5080.
+  api:
+    build:
+      context: .
+      dockerfile: src/Api/Dockerfile
+    container_name: order-api
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+    environment:
+      ConnectionStrings__Default: "Server=sqlserver,1433;Database=OrderAccumulator;User Id=sa;Password=Order@Acc2026!;TrustServerCertificate=True"
+      Kafka__BootstrapServers: kafka:29092
+    ports:
+      - "5080:8080"
+
+  # Formulário web (http://localhost:5173). O nginx repassa /api/* para a API.
+  order-generator:
+    build:
+      context: ./OrderGenerator
+    container_name: order-generator
+    depends_on:
+      - api
+    ports:
+      - "5173:80"
 
 volumes:
   sqlserver-data:
