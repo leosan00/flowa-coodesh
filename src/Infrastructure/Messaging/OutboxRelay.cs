@@ -46,7 +46,6 @@ public sealed class OutboxRelay(IServiceScopeFactory scopeFactory, ILogger<Outbo
         }
         catch (OperationCanceledException)
         {
-            // desligando
         }
     }
 }

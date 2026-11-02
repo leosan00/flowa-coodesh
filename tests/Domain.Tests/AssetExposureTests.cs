@@ -52,7 +52,6 @@ public class AssetExposureTests
     {
         var exposure = new AssetExposure(Symbol.PETR4);
 
-        // 1000 x 999.99 = 999.990,00 ; + 10 x 1.00 = 1.000.000,00 exato
         exposure.Apply(Buy(1000, 999.99m));
         var result = exposure.Apply(Buy(10, 1.00m));
 

@@ -35,8 +35,6 @@ public class OrdersController() : ControllerBase
         };
     }
 
-    /// <summary>Ordens processadas (aceitas e rejeitadas), da mais recente para a mais antiga.</summary>
-    /// <param name="take">Quantas ordens devolver (padrão 50, máximo 500).</param>
     [HttpGet]
     [ProducesResponseType<IEnumerable<OrderHistoryResponse>>(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetOrders(

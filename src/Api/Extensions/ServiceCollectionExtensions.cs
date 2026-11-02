@@ -43,7 +43,6 @@ public static class ServiceCollectionExtensions
     {
         services.Configure<KafkaOptions>(configuration.GetSection(KafkaOptions.SectionName));
 
-        // Um produtor para a aplicação toda: é thread-safe e o container o descarta (com flush) ao desligar.
         services.AddSingleton<IProducer<string, string>>(provider =>
         {
             var options = provider.GetRequiredService<IOptions<KafkaOptions>>().Value;

@@ -4,10 +4,6 @@ using OrderAccumulator.Domain;
 
 namespace OrderAccumulator.Application.UseCases.PlaceOrder;
 
-/// <summary>
-/// Orquestra o recebimento de uma ordem. As regras (limite, validações) vivem no Domain e a gravação
-/// da exposição junto com o evento (outbox) é transacional no repositório; aqui só se coordena e se mapeia a resposta.
-/// </summary>
 public sealed class PlaceOrderUseCase(
     IExposureRepository exposures,
     IExposureReadModel readModel,

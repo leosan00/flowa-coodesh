@@ -3,10 +3,6 @@ using static OrderAccumulator.Domain.PtBrFormat;
 
 namespace OrderAccumulator.Domain;
 
-/// <summary>
-/// Exposição financeira de um ativo: soma de (preço × quantidade) das compras menos a das vendas.
-/// Garante que o valor absoluto nunca ultrapasse <see cref="ExposureLimit.PerAsset"/>.
-/// </summary>
 public sealed class AssetExposure
 {
     public Symbol Symbol { get; }
@@ -21,10 +17,6 @@ public sealed class AssetExposure
         Value = value;
     }
 
-    /// <summary>
-    /// Aplica a ordem se o novo valor absoluto da exposição não ultrapassar o limite
-    /// (exatamente o limite é aceito). Uma ordem rejeitada não altera a exposição.
-    /// </summary>
     public OrderResult Apply(Order order)
     {
         ArgumentNullException.ThrowIfNull(order);

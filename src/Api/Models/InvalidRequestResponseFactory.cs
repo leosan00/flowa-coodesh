@@ -3,7 +3,6 @@ using OrderAccumulator.Domain.Enums;
 
 namespace OrderAccumulator.Api.Models;
 
-/// <summary>Faz o erro de binding (JSON malformado, tipo errado, valor inválido) sair no mesmo formato das demais respostas.</summary>
 public static class InvalidRequestResponseFactory
 {
     public static readonly IReadOnlyDictionary<string, string> Messages = new Dictionary<string, string>

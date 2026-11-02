@@ -32,7 +32,6 @@ public sealed class ExposureReadModel(AppDbContext db) : IExposureReadModel
             .Take(take)
             .ToListAsync(cancellationToken);
 
-        // O datetime2 volta sem fuso; o evento sempre foi gravado em UTC.
         return rows
             .Select(row => new OrderHistoryItem(
                 row.OrderId,

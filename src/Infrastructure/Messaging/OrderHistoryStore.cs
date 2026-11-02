@@ -21,7 +21,6 @@ public sealed class OrderHistoryStore(AppDbContext db) : IOrderHistoryStore
         }
         catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: PrimaryKeyViolation or UniqueIndexViolation })
         {
-            // Mesmo EventId já gravado: o Kafka entregou a mensagem mais de uma vez.
             db.Entry(row).State = EntityState.Detached;
             return false;
         }

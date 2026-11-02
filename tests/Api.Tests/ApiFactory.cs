@@ -11,10 +11,6 @@ using OrderAccumulator.Infrastructure.Persistence;
 
 namespace OrderAccumulator.Api.Tests;
 
-/// <summary>
-/// Sobe a Api em memória sem banco: o <see cref="AppDbContext"/> é removido (qualquer acesso acidental ao banco
-/// falha na hora) e os repositórios são mocks controlados pelo teste.
-/// </summary>
 public sealed class ApiFactory : WebApplicationFactory<Program>
 {
     public Mock<IExposureRepository> Repository { get; } = new();
@@ -39,7 +35,6 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         });
     }
 
-    /// <summary>Sem os jobs do Kafka (outbox e histórico): nenhum deles faz parte do contrato HTTP testado aqui.</summary>
     private static void RemoveMessaging(IServiceCollection services)
     {
         var jobs = services
@@ -57,7 +52,6 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         services.RemoveAll<IProducer<string, string>>();
     }
 
-    /// <summary>Limpa configurações e chamadas registradas pelos mocks, deixando-os prontos para o próximo teste.</summary>
     public void ResetMocks()
     {
         Repository.Reset();
