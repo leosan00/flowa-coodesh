@@ -39,6 +39,7 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddMessaging(builder.Configuration);
 builder.Services.AddUseCases();
 
 var app = builder.Build();
