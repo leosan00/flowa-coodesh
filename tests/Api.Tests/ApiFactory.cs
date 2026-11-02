@@ -39,16 +39,21 @@ public sealed class ApiFactory : WebApplicationFactory<Program>
         });
     }
 
-    /// <summary>Sem o job do outbox e sem Kafka: nenhum deles faz parte do contrato HTTP testado aqui.</summary>
+    /// <summary>Sem os jobs do Kafka (outbox e histórico): nenhum deles faz parte do contrato HTTP testado aqui.</summary>
     private static void RemoveMessaging(IServiceCollection services)
     {
-        var relay = services.Where(d => d.ServiceType == typeof(IHostedService) && d.ImplementationType == typeof(OutboxRelay)).ToList();
-        foreach (var descriptor in relay)
+        var jobs = services
+            .Where(d => d.ServiceType == typeof(IHostedService)
+                && (d.ImplementationType == typeof(OutboxRelay) || d.ImplementationType == typeof(OrderHistoryConsumer)))
+            .ToList();
+        foreach (var descriptor in jobs)
             services.Remove(descriptor);
 
         services.RemoveAll<OutboxDispatcher>();
         services.RemoveAll<IOutboxStore>();
         services.RemoveAll<IOutboxPublisher>();
+        services.RemoveAll<OrderHistoryProjector>();
+        services.RemoveAll<IOrderHistoryStore>();
         services.RemoveAll<IProducer<string, string>>();
     }
 
