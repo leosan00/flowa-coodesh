@@ -72,3 +72,44 @@ END;
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102155845_AddOrderHistory'
+)
+BEGIN
+    CREATE TABLE [OrderHistory] (
+        [EventId] uniqueidentifier NOT NULL,
+        [OrderId] uniqueidentifier NOT NULL,
+        [Symbol] nvarchar(16) NOT NULL,
+        [Side] nvarchar(8) NOT NULL,
+        [Quantity] int NOT NULL,
+        [Price] decimal(18,2) NOT NULL,
+        [Accepted] bit NOT NULL,
+        [Exposure] decimal(18,2) NOT NULL,
+        [Reason] nvarchar(500) NULL,
+        [OccurredAtUtc] datetime2 NOT NULL,
+        CONSTRAINT [PK_OrderHistory] PRIMARY KEY ([EventId])
+    );
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102155845_AddOrderHistory'
+)
+BEGIN
+    CREATE INDEX [IX_OrderHistory_OccurredAtUtc] ON [OrderHistory] ([OccurredAtUtc]);
+END;
+
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261102155845_AddOrderHistory'
+)
+BEGIN
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261102155845_AddOrderHistory', N'10.0.14');
+END;
+
+COMMIT;
+GO
+

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using OrderAccumulator.Api.Models;
+using OrderAccumulator.Application.ReadModels;
 using OrderAccumulator.Application.UseCases;
+using OrderAccumulator.Application.UseCases.GetOrderHistory.Models;
 using OrderAccumulator.Application.UseCases.PlaceOrder.Models;
 
 namespace OrderAccumulator.Api.Controllers;
@@ -31,5 +33,19 @@ public class OrdersController() : ControllerBase
             PlaceOrderStatus.Rejected => Conflict(response),
             _ => BadRequest(response)
         };
+    }
+
+    /// <summary>Ordens processadas (aceitas e rejeitadas), da mais recente para a mais antiga.</summary>
+    /// <param name="take">Quantas ordens devolver (padrão 50, máximo 500).</param>
+    [HttpGet]
+    [ProducesResponseType<IEnumerable<OrderHistoryResponse>>(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetOrders(
+        [FromServices] IUseCase<GetOrderHistoryRequestModel, IReadOnlyList<OrderHistoryItem>> getHistory,
+        CancellationToken cancellationToken,
+        [FromQuery] int take = GetOrderHistoryRequestModel.DefaultTake)
+    {
+        var history = await getHistory.ExecuteAsync(new GetOrderHistoryRequestModel(take), cancellationToken);
+
+        return Ok(history.Select(OrderHistoryResponse.From));
     }
 }

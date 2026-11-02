@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using Moq;
+using OrderAccumulator.Application.ReadModels;
 using OrderAccumulator.Domain;
 using OrderAccumulator.Domain.Enums;
 
@@ -126,5 +127,54 @@ public sealed class OrdersEndpointTests : IClassFixture<ApiFactory>, IAsyncLifet
         Assert.Equal(Side.Sell, received.Side);
         Assert.Equal(584, received.Quantity);
         Assert.Equal(54.87m, received.Price);
+    }
+
+    [Fact]
+    public async Task Exposure_lists_every_symbol_with_the_documented_fields()
+    {
+        _factory.ReadModel
+            .Setup(r => r.GetExposuresAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new ExposureView(Symbol.VALE3, 250m)]);
+
+        var response = await _client.GetAsync("/exposure");
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(3, body.GetArrayLength());
+
+        decimal ExposureOf(string ativo) => body.EnumerateArray()
+            .Single(item => item.GetProperty("ativo").GetString() == ativo)
+            .GetProperty("exposicao_atual").GetDecimal();
+
+        Assert.Equal(250m, ExposureOf("VALE3"));
+        Assert.Equal(0m, ExposureOf("PETR4"));
+        Assert.Equal(0m, ExposureOf("VIIA4"));
+    }
+
+    [Fact]
+    public async Task Order_history_returns_the_documented_fields_and_forwards_take()
+    {
+        var orderId = Guid.NewGuid();
+        var when = new DateTimeOffset(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+        _factory.ReadModel
+            .Setup(r => r.GetOrderHistoryAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync([new OrderHistoryItem(orderId, Symbol.PETR4, Side.Sell, 10, 25.50m, false, -255m, "acima do limite", when)]);
+
+        var response = await _client.GetAsync("/orders?take=5");
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        _factory.ReadModel.Verify(r => r.GetOrderHistoryAsync(5, It.IsAny<CancellationToken>()), Times.Once);
+
+        var order = Assert.Single(body.EnumerateArray());
+        Assert.Equal(orderId, order.GetProperty("ordem_id").GetGuid());
+        Assert.Equal("PETR4", order.GetProperty("ativo").GetString());
+        Assert.Equal("V", order.GetProperty("lado").GetString());
+        Assert.Equal(10, order.GetProperty("quantidade").GetInt32());
+        Assert.Equal(25.50m, order.GetProperty("preco").GetDecimal());
+        Assert.False(order.GetProperty("aceita").GetBoolean());
+        Assert.Equal(-255m, order.GetProperty("exposicao_atual").GetDecimal());
+        Assert.Equal("acima do limite", order.GetProperty("msg_erro").GetString());
+        Assert.Equal(when, order.GetProperty("registrada_em").GetDateTimeOffset());
     }
 }
