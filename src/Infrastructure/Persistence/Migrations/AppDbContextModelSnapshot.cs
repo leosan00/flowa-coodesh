@@ -54,6 +54,52 @@ namespace OrderAccumulator.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("OrderAccumulator.Infrastructure.Persistence.Entities.OrderHistoryRow", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Accepted")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Exposure")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OccurredAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Side")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
+
+                    b.Property<string>("Symbol")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.HasKey("EventId");
+
+                    b.HasIndex("OccurredAtUtc");
+
+                    b.ToTable("OrderHistory", (string)null);
+                });
+
             modelBuilder.Entity("OrderAccumulator.Infrastructure.Persistence.Entities.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")

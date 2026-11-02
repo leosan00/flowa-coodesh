@@ -8,6 +8,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
 {
     public DbSet<AssetExposureRow> Exposures => Set<AssetExposureRow>();
     public DbSet<OutboxMessage> Outbox => Set<OutboxMessage>();
+    public DbSet<OrderHistoryRow> OrderHistory => Set<OrderHistoryRow>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,6 +31,19 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
             entity.Property(e => e.Key).HasMaxLength(16).IsRequired();
             entity.Property(e => e.Payload).IsRequired();
             entity.HasIndex(e => e.ProcessedAtUtc);
+        });
+
+        modelBuilder.Entity<OrderHistoryRow>(entity =>
+        {
+            entity.ToTable("OrderHistory");
+            entity.HasKey(e => e.EventId);
+            entity.Property(e => e.EventId).ValueGeneratedNever();
+            entity.Property(e => e.Symbol).HasConversion<string>().HasMaxLength(16);
+            entity.Property(e => e.Side).HasConversion<string>().HasMaxLength(8);
+            entity.Property(e => e.Price).HasPrecision(18, 2);
+            entity.Property(e => e.Exposure).HasPrecision(18, 2);
+            entity.Property(e => e.Reason).HasMaxLength(500);
+            entity.HasIndex(e => e.OccurredAtUtc);
         });
     }
 }
