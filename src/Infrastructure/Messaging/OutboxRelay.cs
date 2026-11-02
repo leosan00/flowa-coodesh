@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 
 namespace OrderAccumulator.Infrastructure.Messaging;
 
-/// <summary>Job em segundo plano que esvazia o outbox: lê as mensagens pendentes e as publica.</summary>
 public sealed class OutboxRelay(IServiceScopeFactory scopeFactory, ILogger<OutboxRelay> logger) : BackgroundService
 {
     private const int BatchSize = 100;
@@ -17,7 +16,6 @@ public sealed class OutboxRelay(IServiceScopeFactory scopeFactory, ILogger<Outbo
         {
             try
             {
-                // Um escopo por rodada: o DbContext é scoped e não deve viver tanto quanto o job.
                 await using var scope = scopeFactory.CreateAsyncScope();
                 var dispatcher = scope.ServiceProvider.GetRequiredService<OutboxDispatcher>();
 
@@ -25,7 +23,6 @@ public sealed class OutboxRelay(IServiceScopeFactory scopeFactory, ILogger<Outbo
                 if (published > 0)
                     logger.LogInformation("Outbox: {Count} mensagem(ns) publicada(s).", published);
 
-                // Lote cheio: provavelmente há mais; segue sem esperar.
                 if (published < BatchSize)
                     await Task.Delay(IdleDelay, stoppingToken);
             }
